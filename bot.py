@@ -34,11 +34,12 @@ def run_flask():
     app.run(host='0.0.0.0', port=port)
 
 
+# ТОКЕН из вашего нового кода
 BOT_TOKEN = "8577449187:AAEEqSAH-68KoYSHHIbiIp1ObjvHDlR6ojA"
 bot = telebot.TeleBot(BOT_TOKEN)
 
 # Дата начала весеннего семестра 2025-2026
-START_DATE = datetime(2026, 2, 9)
+START_DATE = datetime(2026, 2, 9)  # 09.02.2026 - начало семестра
 
 # Словари для хранения данных пользователей
 user_selected_weeks = {}
@@ -55,9 +56,9 @@ def save_data():
         }
         with open(DATA_FILE, 'wb') as f:
             pickle.dump(data, f)
-        print("🌸 Данные сохранены")
+        print("✅ Данные сохранены")
     except Exception as e:
-        print(f"💔 Ошибка сохранения данных: {e}")
+        print(f"❌ Ошибка сохранения данных: {e}")
 
 
 def load_data():
@@ -68,13 +69,13 @@ def load_data():
             data = pickle.load(f)
             user_selected_weeks = data.get('weeks', {})
             user_selected_subgroups = data.get('subgroups', {})
-        print(f"🌸 Данные загружены. Пользователей: {len(user_selected_subgroups)}")
+        print(f"✅ Данные загружены. Пользователей: {len(user_selected_subgroups)}")
     except FileNotFoundError:
-        print("💫 Файл данных не найден, создаем новый")
+        print("ℹ️ Файл данных не найден, создаем новый")
         user_selected_weeks = {}
         user_selected_subgroups = {}
     except Exception as e:
-        print(f"💔 Ошибка загрузки данных: {e}")
+        print(f"❌ Ошибка загрузки данных: {e}")
         user_selected_weeks = {}
         user_selected_subgroups = {}
 
@@ -84,15 +85,31 @@ load_data()
 atexit.register(save_data)
 
 
-# Функция определения текущей недели
 def get_current_week():
     today = datetime.now()
+    print(f"🔍 Отладка: Сегодня: {today.strftime('%d.%m.%Y')}, Начало семестра: {START_DATE.strftime('%d.%m.%Y')}")
+
+    # Если сегодня день начала семестра - это II неделя (по условию задачи)
+    if today.date() == START_DATE.date():
+        print("🔍 Отладка: Сегодня начало семестра, возвращаем II (согласно условию)")
+        return "II"
+
+    # Если до начала семестра
     if today < START_DATE:
-        return "I"
+        print("🔍 Отладка: До начала семестра, возвращаем II (согласно условию)")
+        return "II"
 
     days_diff = (today - START_DATE).days
     week_num = (days_diff // 7) % 2
-    return "I" if week_num == 0 else "II"
+
+    print(f"🔍 Отладка: Дней от начала: {days_diff}, Неделя №: {week_num}")
+
+    # ИЗМЕНЕНО: Семестр начинается со II недели, поэтому:
+    # 0 -> II неделя (было I)
+    # 1 -> I неделя (было II)
+    result = "II" if week_num == 0 else "I"  # ИНВЕРСИРОВАНО!
+    print(f"🔍 Отладка: Результат: {result}")
+    return result
 
 
 # Функция получения недели для конкретного пользователя
@@ -111,7 +128,7 @@ def get_user_subgroup(user_id):
     return user_selected_subgroups.get(user_id, 1)  # По умолчанию 1 подгруппа
 
 
-# Расписание для двух подгрупп (ВАШЕ НОВОЕ РАСПИСАНИЕ)
+# РАСПИСАНИЕ ИЗ ВАШЕГО НОВОГО КОДА (с эмодзи и новым содержанием)
 schedule = {
     # Подгруппа 1
     1: {
@@ -497,7 +514,7 @@ def start(message):
 
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True, row_width=2)
 
-    # Кнопки дней недели с эмодзи
+    # Кнопки дней недели С ЭМОДЗИ (из нового кода)
     days = ['🌸 Понедельник', '🌷 Вторник', '🌼 Среда', '💐 Четверг', '🌺 Пятница', '🌻 Суббота']
     buttons = [types.KeyboardButton(day) for day in days]
 
@@ -508,31 +525,31 @@ def start(message):
         else:
             markup.row(buttons[i])
 
-    # Дополнительные кнопки с эмодзи
+    # Дополнительные кнопки (с эмодзи из нового кода)
     markup.row(
         types.KeyboardButton('📅 Сегодня'),
         types.KeyboardButton('📆 Завтра')
     )
     markup.row(
-        types.KeyboardButton('🌸 Какая неделя?'),
+        types.KeyboardButton('🌸 Какая неделя?'),  # Изменено с 'ℹ️ Какая неделя?'
         types.KeyboardButton('🔄 Сменить неделю')
     )
     markup.row(
         types.KeyboardButton('👥 Сменить подгруппу'),
-        types.KeyboardButton('💖 Помощь')
+        types.KeyboardButton('💖 Помощь')  # Изменено с '/help'
     )
 
     # Определяем статус недели
     week_status = ""
     if user_id in user_selected_weeks:
         if user_selected_weeks[user_id] == "auto":
-            week_status = "Автоматический режим ✨"
+            week_status = "Автоматический режим ✨"  # Добавлены эмодзи
         else:
-            week_status = f"Ручной режим: {user_selected_weeks[user_id]} неделя 💫"
+            week_status = f"Ручной режим: {user_selected_weeks[user_id]} неделя 💫"  # Добавлены эмодзи
     else:
         week_status = "Автоматический режим ✨"
 
-    # Приветственное сообщение в девчачьем стиле
+    # Приветственное сообщение (стилизованное как в новом коде)
     week_num = (today - START_DATE).days // 7 + 1 if today >= START_DATE else 0
     welcome_msg = f"""
 🌸✨ *Расписание БГТУ* ✨🌸
@@ -559,12 +576,13 @@ def show_subgroup_selection(message):
     """Показывает меню выбора подгруппы"""
     markup = types.InlineKeyboardMarkup(row_width=2)
 
+    # Кнопки с эмодзи из нового кода
     btn_subgroup_1 = types.InlineKeyboardButton(
-        '🌸 Подгруппа 1',
+        '🌸 Подгруппа 1',  # Эмодзи добавлены
         callback_data='select_subgroup_1'
     )
     btn_subgroup_2 = types.InlineKeyboardButton(
-        '🌷 Подгруппа 2',
+        '🌷 Подгруппа 2',  # Эмодзи добавлены
         callback_data='select_subgroup_2'
     )
 
@@ -582,8 +600,14 @@ def show_subgroup_selection(message):
 
 @bot.message_handler(commands=['help'])
 def help_command(message):
-    help_text = """
-🌸✨ *Помощь по боту* ✨🌸
+    print(f"🔍 DEBUG: Получена команда /help от {message.chat.id}")
+
+    try:
+        current_week = get_current_week()
+        start_date_str = START_DATE.strftime('%d.%m.%Y')
+
+        # Текст помощи из нового кода с эмодзи
+        help_text = f"""🌸✨ *Помощь по боту* ✨🌸
 
 *🌸 Основные команды:*
 /start - Главное меню
@@ -607,220 +631,41 @@ def help_command(message):
 
 *💖 Информация:*
 • Бот автоматически определяет I или II неделя
-• Даты начала семестра: 09.02.2026
+• Даты начала семестра: {start_date_str}
 • Если пара не указана - время свободно 🎉
 
 *✨ Приятного использования!* 🌸
 """
-    bot.send_message(message.chat.id, help_text, parse_mode='Markdown')
-
-
-@bot.message_handler(content_types=['text'])
-def handle_text(message):
-    user_id = message.chat.id
-
-    # Проверяем, выбрана ли подгруппа
-    if user_id not in user_selected_subgroups:
-        show_subgroup_selection(message)
-        return
-
-    # Убираем эмодзи для сравнения
-    clean_text = message.text.replace('🌸 ', '').replace('🌷 ', '').replace('🌼 ', '') \
-        .replace('💐 ', '').replace('🌺 ', '').replace('🌻 ', '')
-
-    if message.text == '📅 Сегодня':
-        show_day_schedule(message, "today")
-    elif message.text == '📆 Завтра':
-        show_day_schedule(message, "tomorrow")
-    elif message.text == '🌸 Какая неделя?':
-        week_command(message)
-    elif message.text == '🔄 Сменить неделю':
-        show_week_selection_menu(message)
-    elif message.text == '👥 Сменить подгруппу':
-        show_subgroup_selection(message)
-    elif message.text == '💖 Помощь':
-        help_command(message)
-    elif clean_text in ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]:
-        show_day_with_week_buttons(message, clean_text)
-    else:
-        bot.send_message(message.chat.id,
-                         "🌸 Пожалуйста, выберите день недели из меню ниже 👇")
-
-
-def show_day_schedule(message, day_type):
-    days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
-    today = datetime.now().weekday()
-
-    if day_type == "today":
-        if today < 6:
-            day_name = days[today]
-            prefix = f"🌸✨ *СЕГОДНЯ ({day_name})* ✨🌸"
-        else:
-            bot.send_message(message.chat.id,
-                             "🌸 Сегодня воскресенье - выходной день! 🎉✨\nОтдыхайте и готовьтесь к новой неделе! 💖")
-            return
-    else:  # tomorrow
-        tomorrow = (today + 1) % 7
-        if tomorrow < 6:
-            day_name = days[tomorrow]
-            tomorrow_date = datetime.now() + timedelta(days=1)
-            prefix = f"🌸✨ *ЗАВТРА ({day_name}, {tomorrow_date.strftime('%d.%m')})* ✨🌸"
-        else:
-            bot.send_message(message.chat.id,
-                             "🌸 Завтра воскресенье - выходной день! 🎉✨")
-            return
-
-    show_day_with_week_buttons(message, day_name, prefix)
-
-
-def week_command(message):
-    user_id = message.chat.id
-    if user_id not in user_selected_subgroups:
-        show_subgroup_selection(message)
-        return
-
-    current_week = get_current_week()
-    user_week = get_user_week(user_id)
-    user_subgroup = get_user_subgroup(user_id)
-    today = datetime.now()
-    week_num = (today - START_DATE).days // 7 + 1 if today >= START_DATE else 0
-
-    week_info = f"""
-🌸✨ *Информация о неделе* ✨🌸
-
-*🌸 Текущая неделя:* {current_week}
-*💫 Ваша неделя:* {user_week}
-*👥 Ваша подгруппа:* {user_subgroup}
-*📚 Учебная неделя №:* {week_num}
-*📅 Дата:* {today.strftime('%d.%m.%Y')}
-
-*🎀 Начало семестра:* 09.02.2026
-*✨ Прошло дней:* {(today - START_DATE).days if today >= START_DATE else 0}
-
-*💖 Режим:* {"Ручной 👑" if user_id in user_selected_weeks and user_selected_weeks[user_id] != "auto" else "Автоматический 🤖"}
-"""
-    bot.send_message(message.chat.id, week_info, parse_mode='Markdown')
-
-
-def show_week_selection_menu(message):
-    """Показывает меню выбора недели"""
-    user_id = message.chat.id
-    if user_id not in user_selected_subgroups:
-        show_subgroup_selection(message)
-        return
-
-    current_week = get_current_week()
-
-    markup_inline = types.InlineKeyboardMarkup(row_width=2)
-
-    btn_week_i = types.InlineKeyboardButton(
-        '🌸 I неделя',
-        callback_data='set_week_I'
-    )
-    btn_week_ii = types.InlineKeyboardButton(
-        '🌷 II неделя',
-        callback_data='set_week_II'
-    )
-    btn_auto = types.InlineKeyboardButton(
-        '✨ Автоматически',
-        callback_data='set_week_auto'
-    )
-    btn_current_week = types.InlineKeyboardButton(
-        f'💖 Текущая ({current_week})',
-        callback_data='set_week_current'
-    )
-    btn_cancel = types.InlineKeyboardButton(
-        '💔 Отмена',
-        callback_data='cancel_week_switch'
-    )
-
-    markup_inline.row(btn_week_i, btn_week_ii)
-    markup_inline.row(btn_auto, btn_current_week)
-    markup_inline.row(btn_cancel)
-
-    # Определяем текущий статус
-    current_mode = "Автоматический ✨" if user_id not in user_selected_weeks or user_selected_weeks[
-        user_id] == "auto" else "Ручной 👑"
-    current_week_display = get_user_week(user_id)
-
-    bot.send_message(
-        message.chat.id,
-        f"🌸✨ *Смена недели* ✨🌸\n\n"
-        f"*💫 Текущий режим:* {current_mode}\n"
-        f"*🌸 Показывается неделя:* {current_week_display}\n"
-        f"*📅 Текущая неделя:* {current_week}\n\n"
-        f"🎀 *Выберите действие:*",
-        reply_markup=markup_inline,
-        parse_mode='Markdown'
-    )
-
-
-def show_day_with_week_buttons(message, day_name, prefix=""):
-    user_id = message.chat.id
-    user_week = get_user_week(user_id)
-    user_subgroup = get_user_subgroup(user_id)
-
-    # Проверяем наличие расписания для данной подгруппы, дня и недели
-    if (user_subgroup in schedule and
-            day_name in schedule[user_subgroup] and
-            user_week in schedule[user_subgroup][day_name]):
-
-        response = f"{prefix}\n\n"
-        response += schedule[user_subgroup][day_name][user_week]
-
-        # Отправляем расписание
-        bot.send_message(message.chat.id, response, parse_mode='Markdown')
-
-        # Создаем inline-кнопки
-        markup_inline = types.InlineKeyboardMarkup(row_width=2)
-
-        # Определяем какую неделю показывать для переключения
-        other_week = "II" if user_week == "I" else "I"
-        current_week = get_current_week()
-
-        btn_other_week = types.InlineKeyboardButton(
-            f'🔄 Показать {other_week} неделю',
-            callback_data=f'week_{other_week}_{day_name}'
-        )
-        btn_switch_global = types.InlineKeyboardButton(
-            f'✨ Сменить на {other_week}',
-            callback_data=f'switch_global_{other_week}'
-        )
-        btn_today = types.InlineKeyboardButton(
-            '📅 Сегодня',
-            callback_data='show_today'
-        )
-        btn_auto = types.InlineKeyboardButton(
-            '🤖 Авто',
-            callback_data='switch_auto'
-        )
-        btn_menu = types.InlineKeyboardButton(
-            '🏠 Меню',
-            callback_data='back_to_menu'
-        )
-
-        markup_inline.row(btn_other_week)
-        markup_inline.row(btn_switch_global)
-        markup_inline.row(btn_today, btn_auto, btn_menu)
-
-        mode_text = "Ручной режим 👑" if user_id in user_selected_weeks and user_selected_weeks[
-            user_id] != "auto" else "Автоматический режим 🤖"
-
+        
         bot.send_message(
             message.chat.id,
-            f"*🌸 Сейчас отображается {user_week} неделя*\n"
-            f"*👥 Подгруппа:* {user_subgroup}\n"
-            f"*✨ Режим:* {mode_text}\n"
-            f"*📅 Текущая неделя:* {current_week}",
-            reply_markup=markup_inline,
-            parse_mode='Markdown'
+            help_text,
+            parse_mode='Markdown',
+            disable_web_page_preview=True
         )
-    else:
-        bot.send_message(message.chat.id,
-                         f"🌸 Расписание на {day_name} для подгруппы {user_subgroup} не найдено")
+        print(f"✅ DEBUG: Помощь отправлена пользователю {message.chat.id}")
 
+    except Exception as e:
+        print(f"❌ ERROR в help_command: {e}")
+        print(f"❌ Тип ошибки: {type(e).__name__}")
+        import traceback
+        traceback.print_exc()
 
-# Остальной код остается БЕЗ ИЗМЕНЕНИЙ (все callback-обработчики, команды /today, /tomorrow и т.д.)
+        # Простое сообщение без форматирования
+        simple_help = """📚 ПОМОЩЬ ПО БОТУ
+
+Основные команды:
+/start - Главное меню
+/today - Расписание на сегодня
+/tomorrow - Расписание на завтра
+/week - Какая неделя
+/switch_week - Сменить неделю
+/auto_week - Авторежим
+/change_subgroup - Сменить подгруппу
+/help - Справка"""
+
+        bot.send_message(message.chat.id, simple_help)
+
 
 @bot.message_handler(commands=['today'])
 def today_command(message):
@@ -841,8 +686,34 @@ def tomorrow_command(message):
 
 
 @bot.message_handler(commands=['week'])
-def week_command_handler(message):
-    week_command(message)
+def week_command(message):
+    user_id = message.chat.id
+    if user_id not in user_selected_subgroups:
+        show_subgroup_selection(message)
+        return
+
+    current_week = get_current_week()
+    user_week = get_user_week(user_id)
+    user_subgroup = get_user_subgroup(user_id)
+    today = datetime.now()
+    week_num = (today - START_DATE).days // 7 + 1 if today >= START_DATE else 0
+
+    # Обновленный текст с эмодзи
+    week_info = f"""
+🌸✨ *Информация о неделе* ✨🌸
+
+*🌸 Текущая неделя:* {current_week}
+*💫 Ваша неделя:* {user_week}
+*👥 Ваша подгруппа:* {user_subgroup}
+*📚 Учебная неделя №:* {week_num}
+*📅 Дата:* {today.strftime('%d.%m.%Y')}
+
+*🎀 Начало семестра:* {START_DATE.strftime('%d.%m.%Y')}
+*✨ Прошло дней:* {(today - START_DATE).days if today >= START_DATE else 0}
+
+*💖 Режим:* {"Ручной 👑" if user_id in user_selected_weeks and user_selected_weeks[user_id] != "auto" else "Автоматический 🤖"}
+"""
+    bot.send_message(message.chat.id, week_info, parse_mode='Markdown')
 
 
 @bot.message_handler(commands=['switch_week'])
@@ -866,6 +737,7 @@ def auto_week_command(message):
     user_selected_weeks[user_id] = "auto"
     save_data()
 
+    # Обновленное сообщение с эмодзи
     bot.send_message(
         message.chat.id,
         "🌸✅ *Режим переключен на автоматический!* ✅🌸\n\n"
@@ -881,11 +753,185 @@ def change_subgroup_command(message):
     show_subgroup_selection(message)
 
 
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    user_id = message.chat.id
+
+    # Проверяем, выбрана ли подгруппа
+    if user_id not in user_selected_subgroups:
+        show_subgroup_selection(message)
+        return
+
+    # Убираем эмодзи для сравнения (из нового кода)
+    clean_text = message.text.replace('🌸 ', '').replace('🌷 ', '').replace('🌼 ', '') \
+        .replace('💐 ', '').replace('🌺 ', '').replace('🌻 ', '')
+
+    if message.text == '📅 Сегодня':
+        show_day_schedule(message, "today")
+    elif message.text == '📆 Завтра':
+        show_day_schedule(message, "tomorrow")
+    elif message.text == '🌸 Какая неделя?':  # Обновленная кнопка
+        week_command(message)
+    elif message.text == '🔄 Сменить неделю':
+        show_week_selection_menu(message)
+    elif message.text == '👥 Сменить подгруппу':
+        show_subgroup_selection(message)
+    elif message.text == '💖 Помощь':  # Обновленная кнопка
+        help_command(message)
+    elif clean_text in ["Понедельник", "Вторник", "Среда", "Четверг", "Пятница", "Суббота"]:
+        show_day_with_week_buttons(message, clean_text)
+    else:
+        bot.send_message(message.chat.id,
+                         "🌸 Пожалуйста, выберите день недели из меню ниже 👇")
+
+
+def show_day_schedule(message, day_type):
+    days = ['Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота']
+    today = datetime.now().weekday()
+
+    if day_type == "today":
+        if today < 6:
+            day_name = days[today]
+            prefix = f"🌸✨ *СЕГОДНЯ ({day_name})* ✨🌸"  # Обновленный префикс с эмодзи
+        else:
+            bot.send_message(message.chat.id,
+                             "🌸 Сегодня воскресенье - выходной день! 🎉✨\nОтдыхайте и готовьтесь к новой неделе! 💖")  # Обновлено
+            return
+    else:  # tomorrow
+        tomorrow = (today + 1) % 7
+        if tomorrow < 6:
+            day_name = days[tomorrow]
+            tomorrow_date = datetime.now() + timedelta(days=1)
+            prefix = f"🌸✨ *ЗАВТРА ({day_name}, {tomorrow_date.strftime('%d.%m')})* ✨🌸"  # Обновленный префикс
+        else:
+            bot.send_message(message.chat.id,
+                             "🌸 Завтра воскресенье - выходной день! 🎉✨")  # Обновлено
+            return
+
+    show_day_with_week_buttons(message, day_name, prefix)
+
+
+def show_day_with_week_buttons(message, day_name, prefix=""):
+    user_id = message.chat.id
+    user_week = get_user_week(user_id)
+    user_subgroup = get_user_subgroup(user_id)
+
+    # Проверяем наличие расписания для данной подгруппы, дня и недели
+    if (user_subgroup in schedule and
+            day_name in schedule[user_subgroup] and
+            user_week in schedule[user_subgroup][day_name]):
+
+        response = f"{prefix}\n\n"
+        response += schedule[user_subgroup][day_name][user_week]
+
+        # Создаем inline-кнопки
+        markup_inline = types.InlineKeyboardMarkup(row_width=2)
+
+        # Определяем какую неделю показывать для переключения
+        other_week = "II" if user_week == "I" else "I"
+        current_week = get_current_week()
+
+        btn_other_week = types.InlineKeyboardButton(
+            f'🔄 Показать {other_week} неделю',
+            callback_data=f'week_{other_week}_{day_name}'
+        )
+        btn_switch_global = types.InlineKeyboardButton(
+            f'✨ Сменить на {other_week}',  # Обновлено
+            callback_data=f'switch_global_{other_week}'
+        )
+        btn_today = types.InlineKeyboardButton(
+            '📅 Сегодня',
+            callback_data='show_today'
+        )
+        btn_auto = types.InlineKeyboardButton(
+            '🤖 Авто',
+            callback_data='switch_auto'
+        )
+        btn_menu = types.InlineKeyboardButton(
+            '🏠 Меню',
+            callback_data='back_to_menu'
+        )
+
+        markup_inline.row(btn_other_week)
+        markup_inline.row(btn_switch_global)
+        markup_inline.row(btn_today, btn_auto, btn_menu)
+
+        mode_text = "Ручной режим 👑" if user_id in user_selected_weeks and user_selected_weeks[
+            user_id] != "auto" else "Автоматический режим 🤖"  # Обновлено с эмодзи
+
+        # Добавляем информацию о неделе и кнопки в ОДНО сообщение с расписанием
+        response += f"\n\n*🌸 Сейчас отображается {user_week} неделя*\n"  # Обновлено
+        response += f"*👥 Подгруппа:* {user_subgroup}\n"  # Обновлено
+        response += f"*✨ Режим:* {mode_text}\n"  # Обновлено
+        response += f"*📅 Текущая неделя:* {current_week}"
+
+        # Отправляем ОДНО сообщение с расписанием и кнопками
+        bot.send_message(message.chat.id, response,
+                         reply_markup=markup_inline,
+                         parse_mode='Markdown')
+    else:
+        bot.send_message(message.chat.id,
+                         f"🌸 Расписание на {day_name} для подгруппы {user_subgroup} не найдено")  # Обновлено
+
+
+def show_week_selection_menu(message):
+    """Показывает меню выбора недели"""
+    user_id = message.chat.id
+    current_week = get_current_week()
+
+    markup_inline = types.InlineKeyboardMarkup(row_width=2)
+
+    # Кнопки с эмодзи из нового кода
+    btn_week_i = types.InlineKeyboardButton(
+        '🌸 I неделя',  # Эмодзи добавлены
+        callback_data='set_week_I'
+    )
+    btn_week_ii = types.InlineKeyboardButton(
+        '🌷 II неделя',  # Эмодзи добавлены
+        callback_data='set_week_II'
+    )
+    btn_auto = types.InlineKeyboardButton(
+        '✨ Автоматически',  # Обновлено
+        callback_data='set_week_auto'
+    )
+    btn_current_week = types.InlineKeyboardButton(
+        f'💖 Текущая ({current_week})',  # Обновлено
+        callback_data='set_week_current'
+    )
+    btn_cancel = types.InlineKeyboardButton(
+        '💔 Отмена',  # Обновлено
+        callback_data='cancel_week_switch'
+    )
+
+    markup_inline.row(btn_week_i, btn_week_ii)
+    markup_inline.row(btn_auto, btn_current_week)
+    markup_inline.row(btn_cancel)
+
+    # Определяем текущий статус
+    current_mode = "Автоматический ✨" if user_id not in user_selected_weeks or user_selected_weeks[
+        user_id] == "auto" else "Ручной 👑"  # Обновлено
+    current_week_display = get_user_week(user_id)
+
+    # Обновленное сообщение с эмодзи
+    bot.send_message(
+        message.chat.id,
+        f"🌸✨ *Смена недели* ✨🌸\n\n"
+        f"*💫 Текущий режим:* {current_mode}\n"
+        f"*🌸 Показывается неделя:* {current_week_display}\n"
+        f"*📅 Текущая неделя:* {current_week}\n\n"
+        f"🎀 *Выберите действие:*",
+        reply_markup=markup_inline,
+        parse_mode='Markdown'
+    )
+
+
+# Остальные callback-обработчики остаются такими же, только тексты сообщений обновлены
 @bot.callback_query_handler(func=lambda callback: True)
 def callback_handler(callback):
     user_id = callback.message.chat.id
+    print(f"🔍 Callback: {callback.data} от пользователя {user_id}")
 
-    # Обработка выбора подгруппы
+    # Обработка выбора подгруппы (с обновленными текстами)
     if callback.data == 'select_subgroup_1':
         user_selected_subgroups[user_id] = 1
         save_data()
@@ -930,20 +976,26 @@ def callback_handler(callback):
         if (user_subgroup in schedule and
                 day_name in schedule[user_subgroup] and
                 "I" in schedule[user_subgroup][day_name]):
+
             try:
-                bot.edit_message_text(
-                    schedule[user_subgroup][day_name]["I"],
-                    callback.message.chat.id,
-                    callback.message.message_id - 1
-                )
+                # Определяем префикс из текущего сообщения
+                message_text = callback.message.text
+                lines = message_text.split('\n')
+                prefix = lines[0]  # Берем первую строку как префикс
+
+                # Формируем новое сообщение с I неделей
+                response = f"{prefix}\n\n"
+                response += schedule[user_subgroup][day_name]["I"]
+
                 # Обновляем кнопки
                 markup_inline = types.InlineKeyboardMarkup(row_width=2)
+
                 btn_other_week = types.InlineKeyboardButton(
-                    '🌷 II неделя',
+                    '🌷 II неделя',  # Обновлено
                     callback_data=f'week_II_{day_name}'
                 )
                 btn_switch_global = types.InlineKeyboardButton(
-                    '✨ Сменить на II',
+                    '✨ Сменить на II',  # Обновлено
                     callback_data='switch_global_II'
                 )
                 btn_today = types.InlineKeyboardButton(
@@ -958,19 +1010,30 @@ def callback_handler(callback):
                     '🏠 Меню',
                     callback_data='back_to_menu'
                 )
+
                 markup_inline.row(btn_other_week)
                 markup_inline.row(btn_switch_global)
                 markup_inline.row(btn_today, btn_auto, btn_menu)
 
-                bot.edit_message_reply_markup(
+                # Добавляем информацию о неделе
+                response += f"\n\n*🌸 Отображается I неделя*\n"  # Обновлено
+                response += f"*👥 Подгруппа:* {user_subgroup}\n"  # Обновлено
+                response += f"*✨ Режим:* Ручной\n"  # Обновлено
+                response += f"*📅 Текущая неделя:* {get_current_week()}"
+
+                # Редактируем текущее сообщение
+                bot.edit_message_text(
+                    response,
                     callback.message.chat.id,
                     callback.message.message_id,
-                    reply_markup=markup_inline
+                    reply_markup=markup_inline,
+                    parse_mode='Markdown'
                 )
-                bot.answer_callback_query(callback.id, "🌸 Показана I неделя")
+                bot.answer_callback_query(callback.id, "🌸 Показана I неделя")  # Обновлено
+
             except Exception as e:
-                print(f"💔 Ошибка: {e}")
-                bot.answer_callback_query(callback.id, "💔 Ошибка обновления")
+                print(f"Ошибка: {e}")
+                bot.answer_callback_query(callback.id, "💔 Ошибка обновления")  # Обновлено
 
     elif callback.data.startswith('week_II_'):
         # Показать II неделю для конкретного дня
@@ -980,20 +1043,26 @@ def callback_handler(callback):
         if (user_subgroup in schedule and
                 day_name in schedule[user_subgroup] and
                 "II" in schedule[user_subgroup][day_name]):
+
             try:
-                bot.edit_message_text(
-                    schedule[user_subgroup][day_name]["II"],
-                    callback.message.chat.id,
-                    callback.message.message_id - 1
-                )
+                # Определяем префикс из текущего сообщения
+                message_text = callback.message.text
+                lines = message_text.split('\n')
+                prefix = lines[0]  # Берем первую строку как префикс
+
+                # Формируем новое сообщение с II неделей
+                response = f"{prefix}\n\n"
+                response += schedule[user_subgroup][day_name]["II"]
+
                 # Обновляем кнопки
                 markup_inline = types.InlineKeyboardMarkup(row_width=2)
+
                 btn_other_week = types.InlineKeyboardButton(
-                    '🌸 I неделя',
+                    '🌸 I неделя',  # Обновлено
                     callback_data=f'week_I_{day_name}'
                 )
                 btn_switch_global = types.InlineKeyboardButton(
-                    '✨ Сменить на I',
+                    '✨ Сменить на I',  # Обновлено
                     callback_data='switch_global_I'
                 )
                 btn_today = types.InlineKeyboardButton(
@@ -1008,19 +1077,30 @@ def callback_handler(callback):
                     '🏠 Меню',
                     callback_data='back_to_menu'
                 )
+
                 markup_inline.row(btn_other_week)
                 markup_inline.row(btn_switch_global)
                 markup_inline.row(btn_today, btn_auto, btn_menu)
 
-                bot.edit_message_reply_markup(
+                # Добавляем информацию о неделе
+                response += f"\n\n*🌷 Отображается II неделя*\n"  # Обновлено
+                response += f"*👥 Подгруппа:* {user_subgroup}\n"  # Обновлено
+                response += f"*✨ Режим:* Ручной\n"  # Обновлено
+                response += f"*📅 Текущая неделя:* {get_current_week()}"
+
+                # Редактируем текущее сообщение
+                bot.edit_message_text(
+                    response,
                     callback.message.chat.id,
                     callback.message.message_id,
-                    reply_markup=markup_inline
+                    reply_markup=markup_inline,
+                    parse_mode='Markdown'
                 )
-                bot.answer_callback_query(callback.id, "🌷 Показана II неделя")
+                bot.answer_callback_query(callback.id, "🌷 Показана II неделя")  # Обновлено
+
             except Exception as e:
-                print(f"💔 Ошибка: {e}")
-                bot.answer_callback_query(callback.id, "💔 Ошибка обновления")
+                print(f"Ошибка: {e}")
+                bot.answer_callback_query(callback.id, "💔 Ошибка обновления")  # Обновлено
 
     elif callback.data.startswith('switch_global_'):
         # Глобальное переключение недели
@@ -1028,20 +1108,17 @@ def callback_handler(callback):
         user_selected_weeks[user_id] = week_to_set
         save_data()
 
-        # Удаляем сообщение с кнопками
-        try:
-            bot.delete_message(callback.message.chat.id, callback.message.message_id)
-        except:
-            pass
+        bot.answer_callback_query(callback.id, f"🌸 Установлена {week_to_set} неделя")  # Обновлено
 
-        bot.send_message(
-            user_id,
+        # Закрываем меню и показываем сообщение
+        bot.edit_message_text(
             f"🌸✅ *Расписание переключено на {week_to_set} неделю!* ✅🌸\n\n"
             f"Теперь все дни будут показываться для *{week_to_set} недели*. ✨\n"
             f"Для возврата к автоматическому режиму используйте команду /auto_week 🎀",
+            callback.message.chat.id,
+            callback.message.message_id,
             parse_mode='Markdown'
         )
-        bot.answer_callback_query(callback.id, f"🌸 Установлена {week_to_set} неделя")
 
     elif callback.data == 'switch_auto':
         # Включить автоматический режим
@@ -1049,86 +1126,9 @@ def callback_handler(callback):
         save_data()
 
         current_week = get_current_week()
-        bot.answer_callback_query(
-            callback.id,
-            f"✨ Включен автоматический режим. Текущая неделя: {current_week}"
-        )
+        bot.answer_callback_query(callback.id, f"✨ Включен автоматический режим. Текущая неделя: {current_week}")  # Обновлено
 
-        # Обновляем сообщение
-        try:
-            bot.delete_message(callback.message.chat.id, callback.message.message_id)
-        except:
-            pass
-
-        bot.send_message(
-            user_id,
-            f"🌸✅ *Включен автоматический режим!* ✅🌸\n\n"
-            f"Теперь бот показывает расписание *{current_week} недели* (текущей). ✨",
-            parse_mode='Markdown'
-        )
-
-    elif callback.data == 'set_week_I':
-        # Установить I неделю
-        user_selected_weeks[user_id] = "I"
-        save_data()
-
-        bot.edit_message_text(
-            "🌸✅ *Расписание переключено на I неделю!* ✅🌸\n\n"
-            "Теперь все дни будут показываться для *I недели*. ✨\n"
-            "Для возврата к автоматическому режиму используйте кнопку ниже или команду /auto_week 🎀",
-            callback.message.chat.id,
-            callback.message.message_id,
-            parse_mode='Markdown'
-        )
-
-        markup_inline = types.InlineKeyboardMarkup()
-        btn_auto = types.InlineKeyboardButton(
-            '✨ Вернуться к авторежиму',
-            callback_data='set_week_auto'
-        )
-        markup_inline.row(btn_auto)
-
-        bot.edit_message_reply_markup(
-            callback.message.chat.id,
-            callback.message.message_id,
-            reply_markup=markup_inline
-        )
-        bot.answer_callback_query(callback.id, "🌸 Установлена I неделя")
-
-    elif callback.data == 'set_week_II':
-        # Установить II неделю
-        user_selected_weeks[user_id] = "II"
-        save_data()
-
-        bot.edit_message_text(
-            "🌷✅ *Расписание переключено на II неделю!* ✅🌷\n\n"
-            "Теперь все дни будут показываться для *II недели*. ✨\n"
-            "Для возврата к автоматическому режиму используйте кнопку ниже или команду /auto_week 🎀",
-            callback.message.chat.id,
-            callback.message.message_id,
-            parse_mode='Markdown'
-        )
-
-        markup_inline = types.InlineKeyboardMarkup()
-        btn_auto = types.InlineKeyboardButton(
-            '✨ Вернуться к авторежиму',
-            callback_data='set_week_auto'
-        )
-        markup_inline.row(btn_auto)
-
-        bot.edit_message_reply_markup(
-            callback.message.chat.id,
-            callback.message.message_id,
-            reply_markup=markup_inline
-        )
-        bot.answer_callback_query(callback.id, "🌷 Установлена II неделя")
-
-    elif callback.data == 'set_week_auto':
-        # Включить автоматический режим
-        user_selected_weeks[user_id] = "auto"
-        save_data()
-        current_week = get_current_week()
-
+        # Закрываем меню и показываем сообщение
         bot.edit_message_text(
             f"✨✅ *Включен автоматический режим!* ✅✨\n\n"
             f"Теперь бот показывает расписание *{current_week} недели* (текущей). 🌸",
@@ -1137,19 +1137,56 @@ def callback_handler(callback):
             parse_mode='Markdown'
         )
 
-        markup_inline = types.InlineKeyboardMarkup()
-        btn_menu = types.InlineKeyboardButton(
-            '🏠 В главное меню',
-            callback_data='back_to_menu'
-        )
-        markup_inline.row(btn_menu)
+    elif callback.data == 'set_week_I':
+        # Установить I неделю
+        user_selected_weeks[user_id] = "I"
+        save_data()
 
-        bot.edit_message_reply_markup(
+        bot.answer_callback_query(callback.id, "🌸 Установлена I неделя")  # Обновлено
+
+        # Закрываем меню и показываем сообщение
+        bot.edit_message_text(
+            "🌸✅ *Расписание переключено на I неделю!* ✅🌸\n\n"
+            "Теперь все дни будут показываться для *I недели*. ✨\n"
+            "Для возврата к автоматическому режиму используйте команду /auto_week",
             callback.message.chat.id,
             callback.message.message_id,
-            reply_markup=markup_inline
+            parse_mode='Markdown'
         )
-        bot.answer_callback_query(callback.id, f"✨ Включен авторежим. Текущая неделя: {current_week}")
+
+    elif callback.data == 'set_week_II':
+        # Установить II неделю
+        user_selected_weeks[user_id] = "II"
+        save_data()
+
+        bot.answer_callback_query(callback.id, "🌷 Установлена II неделя")  # Обновлено
+
+        # Закрываем меню и показываем сообщение
+        bot.edit_message_text(
+            "🌷✅ *Расписание переключено на II неделю!* ✅🌷\n\n"
+            "Теперь все дни будут показываться для *II недели*. ✨\n"
+            "Для возврата к автоматическому режиму используйте команду /auto_week",
+            callback.message.chat.id,
+            callback.message.message_id,
+            parse_mode='Markdown'
+        )
+
+    elif callback.data == 'set_week_auto':
+        # Включить автоматический режим
+        user_selected_weeks[user_id] = "auto"
+        save_data()
+        current_week = get_current_week()
+
+        bot.answer_callback_query(callback.id, f"✨ Включен авторежим. Текущая неделя: {current_week}")  # Обновлено
+
+        # Закрываем меню и показываем сообщение
+        bot.edit_message_text(
+            f"✨✅ *Включен автоматический режим!* ✅✨\n\n"
+            f"Теперь бот показывает расписание *{current_week} недели* (текущей).",
+            callback.message.chat.id,
+            callback.message.message_id,
+            parse_mode='Markdown'
+        )
 
     elif callback.data == 'set_week_current':
         # Установить текущую неделю
@@ -1157,6 +1194,9 @@ def callback_handler(callback):
         user_selected_weeks[user_id] = current_week
         save_data()
 
+        bot.answer_callback_query(callback.id, f"💖 Установлена {current_week} неделя")  # Обновлено
+
+        # Закрываем меню и показываем сообщение
         bot.edit_message_text(
             f"💖✅ *Установлена текущая неделя ({current_week})!* ✅💖\n\n"
             f"Теперь бот показывает расписание *{current_week} недели*. ✨",
@@ -1165,39 +1205,23 @@ def callback_handler(callback):
             parse_mode='Markdown'
         )
 
-        markup_inline = types.InlineKeyboardMarkup()
-        btn_auto = types.InlineKeyboardButton(
-            '✨ Включить авторежим',
-            callback_data='set_week_auto'
-        )
-        markup_inline.row(btn_auto)
-
-        bot.edit_message_reply_markup(
-            callback.message.chat.id,
-            callback.message.message_id,
-            reply_markup=markup_inline
-        )
-        bot.answer_callback_query(callback.id, f"💖 Установлена {current_week} неделя")
-
     elif callback.data == 'cancel_week_switch':
         # Отмена смены недели
         bot.delete_message(callback.message.chat.id, callback.message.message_id)
-        bot.answer_callback_query(callback.id, "💔 Отменено")
+        bot.answer_callback_query(callback.id, "💔 Отменено")  # Обновлено
 
     elif callback.data == 'back_to_menu':
+        bot.answer_callback_query(callback.id, "🌸 Возврат в меню")  # Обновлено
         try:
             bot.delete_message(callback.message.chat.id, callback.message.message_id)
         except:
             pass
         # Отправляем обновленное меню
-        msg = bot.send_message(callback.message.chat.id, "🌸 Обновление меню...")
+        msg = bot.send_message(callback.message.chat.id, "🌸 Обновление меню...")  # Обновлено
         start(msg)
 
     elif callback.data == 'show_today':
-        try:
-            bot.delete_message(callback.message.chat.id, callback.message.message_id)
-        except:
-            pass
+        bot.answer_callback_query(callback.id, "🌸 Показываю сегодня")  # Обновлено
         today_command(callback.message)
 
 
@@ -1206,10 +1230,10 @@ def callback_handler(callback):
 def run_flask_server():
     try:
         port = int(os.environ.get('PORT', 10000))
-        print(f"🌸 Flask сервер запускается на порту: {port}")
+        print(f"🚀 Flask сервер запускается на порту: {port}")
         app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False, threaded=True)
     except Exception as e:
-        print(f"💔 Ошибка Flask: {e}")
+        print(f"❌ Ошибка Flask: {e}")
         return
 
 
@@ -1219,52 +1243,52 @@ def keep_alive():
     """
     time.sleep(40)
 
-    # Ваш URL с Render (ЗАМЕНИТЕ на ваш настоящий URL!)
-    YOUR_RENDER_URL = "https://telegram-schedule-bot6pi.onrender.com"  # <-- ЗАМЕНИТЕ ЭТО!
+    # Ваш URL с Render
+    YOUR_RENDER_URL = "https://schedule-bot-x6xr.onrender.com"
 
     while True:
         try:
             response = requests.get(f"{YOUR_RENDER_URL}/ping", timeout=10)
-            print(f"🌸 Keep-alive ping отправлен: {response.status_code}")
+            print(f"✅ Keep-alive ping отправлен: {response.status_code}")
         except Exception as e:
-            print(f"💫 Keep-alive не удался: {e}")
+            print(f"⚠️ Keep-alive не удался: {e}")
 
         time.sleep(480)
 
 
 def run_telegram_bot():
-    print("🌸✨ Telegram бот запущен! ✨🌸")
+    print("🤖 Telegram бот запущен!")
     print(f"📅 Семестр начинается: {START_DATE.strftime('%d.%m.%Y')}")
-    print(f"🌸 Текущая неделя: {get_current_week()}")
+    current_week = get_current_week()
+    print(f"📆 Текущая неделя: {current_week}")
+    print(f"🔍 Отладка: Дней от начала семестра: {(datetime.now() - START_DATE).days}")
     bot.polling(none_stop=True, interval=1, timeout=60)
 
 
 if __name__ == "__main__":
-    print("🌸✨ ===== НАЧАЛО ЗАПУСКА СИСТЕМЫ ===== ✨🌸")
+    print("🎬 ===== НАЧАЛО ЗАПУСКА СИСТЕМЫ =====")
 
     # Загружаем данные
     load_data()
 
     # 1. Запускаем keep-alive в отдельном потоке
-    print("1. Запуск системы keep-alive... 🌸")
+    print("1. Запуск системы keep-alive...")
     keep_alive_thread = threading.Thread(target=keep_alive)
     keep_alive_thread.daemon = True
     keep_alive_thread.start()
 
     # 2. Запускаем Flask сервер
-    print("2. Запуск Flask сервера... 🌸")
+    print("2. Запуск Flask сервера...")
     flask_thread = threading.Thread(target=run_flask_server)
     flask_thread.daemon = True
     flask_thread.start()
 
     # 3. Ждем запуска Flask
-    print("3. Ожидание запуска компонентов (5 секунд)... 💫")
+    print("3. Ожидание запуска компонентов (5 секунд)...")
     time.sleep(5)
 
     # 4. Запускаем Telegram бота
-    print("4. Запуск Telegram бота... 🌸")
+    print("4. Запуск Telegram бота...")
     run_telegram_bot()
 
-
-    print("🏁 Все системы успешно запущены! ✨🌸")
-
+    print("🏁 Все системы успешно запущены!")
