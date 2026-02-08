@@ -1220,7 +1220,7 @@ def keep_alive():
     time.sleep(40)
 
     # Ваш URL с Render (ЗАМЕНИТЕ на ваш настоящий URL!)
-    YOUR_RENDER_URL = "https://schedule-bot-x6xr.onrender.com"  # <-- ЗАМЕНИТЕ ЭТО!
+    YOUR_RENDER_URL = "https://telegram-schedule-bot6pi.onrender.com"  # <-- ЗАМЕНИТЕ ЭТО!
 
     while True:
         try:
@@ -1267,3 +1267,4 @@ if __name__ == "__main__":
 
 
     print("🏁 Все системы успешно запущены! ✨🌸")
+
