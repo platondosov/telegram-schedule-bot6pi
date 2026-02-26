@@ -1099,7 +1099,7 @@ def run_flask_server():
 
 def keep_alive():
     time.sleep(40)
-    YOUR_RENDER_URL = "https://telegram-schedule-bot6pi.onrender.com"
+    YOUR_RENDER_URL = "https://telegram-schedule-bot6pi-u16s.onrender.com"
     while True:
         try:
             response = requests.get(f"{YOUR_RENDER_URL}/ping", timeout=10)
@@ -1131,3 +1131,4 @@ if __name__ == "__main__":
     print("4. Запуск Telegram бота...")
     run_telegram_bot()
     print("🏁 Все системы успешно запущены!")
+
